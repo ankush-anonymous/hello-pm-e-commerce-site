@@ -36,6 +36,7 @@ export default function AdminPage() {
     carbonCertificate: "",
     isEcoVerified: false,
     imageUrl: "", // Add this line
+    isCarbonEstimated: false,
   })
 
   const resetForm = () => {
@@ -52,6 +53,7 @@ export default function AdminPage() {
       carbonCertificate: "",
       isEcoVerified: false,
       imageUrl: "", // Add this line
+      isCarbonEstimated: false,
     })
     setShowAddForm(false)
     setEditingProduct(null)
@@ -79,6 +81,7 @@ export default function AdminPage() {
       carbonCertificate: formData.carbonCertificate || undefined,
       isEcoVerified: !!formData.carbonCertificate, // Auto-verify if certificate is uploaded
       createdAt: editingProduct?.createdAt || new Date(),
+      isCarbonEstimated: formData.isCarbonEstimated,
     }
 
     if (editingProduct) {
@@ -107,6 +110,7 @@ export default function AdminPage() {
       carbonCertificate: product.carbonCertificate || "",
       isEcoVerified: product.isEcoVerified,
       imageUrl: product.images[0] || "", // Add this line
+      isCarbonEstimated: product.isCarbonEstimated,
     })
     setShowAddForm(true)
   }
@@ -215,6 +219,15 @@ export default function AdminPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     Enter the carbon footprint in kg CO₂ equivalent for this product
                   </p>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="carbonEstimated"
+                    checked={formData.isCarbonEstimated}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isCarbonEstimated: checked as boolean })}
+                  />
+                  <Label htmlFor="carbonEstimated">Carbon footprint is estimated (not measured)</Label>
                 </div>
 
                 <div>
@@ -382,6 +395,9 @@ export default function AdminPage() {
                         <span className="text-green-600">🌱</span>
                         Carbon Footprint: {product.carbonFootprint} kg CO₂
                       </p>
+                      {product.isCarbonEstimated && (
+                        <p className="text-orange-600 text-sm">~ Carbon footprint estimated</p>
+                      )}
                       {product.carbonCertificate && (
                         <p className="flex items-center gap-1 text-blue-600">
                           <span>📄</span>

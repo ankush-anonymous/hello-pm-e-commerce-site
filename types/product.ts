@@ -12,6 +12,7 @@ export interface Product {
   carbonFootprint: number // in kg CO2 equivalent
   carbonCertificate?: string // URL to certificate file
   isEcoVerified: boolean // whether product has valid certificate
+  isCarbonEstimated: boolean // whether carbon footprint is estimated or measured
   createdAt: Date
 }
 

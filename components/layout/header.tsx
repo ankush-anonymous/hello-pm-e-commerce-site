@@ -27,7 +27,9 @@ export function Header() {
             <Link href="/men" className="text-sm font-medium hover:underline">
               Men
             </Link>
-     
+            <Link href="/featured" className="text-sm font-medium hover:underline">
+              Featured
+            </Link>
             <Link href="/gallery" className="text-sm font-medium hover:underline">
               Gallery
             </Link>

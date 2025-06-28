@@ -23,14 +23,19 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Verified Badge */}
-        {product.isEcoVerified && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge variant="secondary" className="bg-blue-600 text-white">
-              ✓ VERIFIED
+        {/* Verification Badges */}
+        <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+          {product.isEcoVerified && (
+            <Badge variant="secondary" className="bg-blue-600 text-white text-xs">
+              ✓ CERTIFIED
             </Badge>
-          </div>
-        )}
+          )}
+          {product.isCarbonEstimated && (
+            <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300 text-xs">
+              ~ ESTIMATED
+            </Badge>
+          )}
+        </div>
 
         <CardContent className="p-0">
           <div className="aspect-[3/4] overflow-hidden">
@@ -75,15 +80,21 @@ export function ProductCard({ product }: ProductCardProps) {
               <div className="flex items-center gap-2">
                 <span className={`text-lg ${isLowCarbon ? "text-green-600" : "text-orange-600"}`}>🌱</span>
                 <div className="flex flex-col">
-                  <span className={`font-bold text-sm ${isLowCarbon ? "text-green-600" : "text-orange-600"}`}>
-                    {product.carbonFootprint} kg CO₂
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className={`font-bold text-sm ${isLowCarbon ? "text-green-600" : "text-orange-600"}`}>
+                      {product.carbonFootprint} kg CO₂
+                    </span>
+                    {product.isCarbonEstimated && <span className="text-orange-600 text-xs">~</span>}
+                  </div>
                   <span className="text-xs text-muted-foreground">
                     {isLowCarbon ? "Low Impact" : "Standard Impact"}
                   </span>
                 </div>
               </div>
-              {product.isEcoVerified && <div className="text-blue-600 text-xs font-medium">✓ Certified</div>}
+              <div className="flex flex-col items-end gap-1">
+                {product.isEcoVerified && <div className="text-blue-600 text-xs font-medium">✓ Certified</div>}
+                {product.isCarbonEstimated && <div className="text-orange-600 text-xs">~ Estimated</div>}
+              </div>
             </div>
           </div>
         </CardFooter>
