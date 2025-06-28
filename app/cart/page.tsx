@@ -1,16 +1,22 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { CheckoutSuccessPopup } from "@/components/checkout/checkout-success-popup"
 import { useCart } from "@/contexts/cart-context"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
 
 export default function CartPage() {
   const { state, dispatch } = useCart()
+  const { toast } = useToast()
+  const [showCheckoutPopup, setShowCheckoutPopup] = useState(false)
+  const [isProcessingCheckout, setIsProcessingCheckout] = useState(false)
 
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
@@ -22,6 +28,25 @@ export default function CartPage() {
 
   const removeItem = (id: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: id })
+  }
+
+  const handleCheckout = async () => {
+    setIsProcessingCheckout(true)
+
+    // Simulate checkout processing
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    setIsProcessingCheckout(false)
+    setShowCheckoutPopup(true)
+  }
+
+  const handleCheckoutComplete = () => {
+    setShowCheckoutPopup(false)
+    dispatch({ type: "CLEAR_CART" })
+    toast({
+      title: "Thank you for your purchase!",
+      description: "Your order has been confirmed and you'll receive an email shortly.",
+    })
   }
 
   if (state.items.length === 0) {
@@ -38,6 +63,8 @@ export default function CartPage() {
       </div>
     )
   }
+
+  const finalTotal = state.total * 1.1 // Including tax
 
   return (
     <div className="min-h-screen bg-background">
@@ -71,6 +98,13 @@ export default function CartPage() {
                           Size: {item.size} | Color: {item.color}
                         </p>
                         <p className="font-semibold">${item.product.price}</p>
+
+                        {/* Carbon footprint info */}
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="text-green-600">🌱</span>
+                          <span className="text-muted-foreground">{item.product.carbonFootprint} kg CO₂ each</span>
+                          {item.product.isEcoVerified && <span className="text-blue-600 ml-2">✓ Verified</span>}
+                        </div>
 
                         <div className="flex items-center gap-2">
                           <Button
@@ -139,10 +173,28 @@ export default function CartPage() {
                 <hr />
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>${(state.total * 1.1).toFixed(2)}</span>
+                  <span>${finalTotal.toFixed(2)}</span>
                 </div>
-                <Button className="w-full" size="lg">
-                  Proceed to Checkout
+
+                {/* Environmental preview */}
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <div className="text-sm text-green-800">
+                    <div className="flex items-center gap-1 mb-1">
+                      <span className="text-green-600">🌱</span>
+                      <span className="font-medium">Environmental Impact</span>
+                    </div>
+                    <p className="text-xs">
+                      Total carbon footprint:{" "}
+                      {state.items
+                        .reduce((sum, item) => sum + item.product.carbonFootprint * item.quantity, 0)
+                        .toFixed(1)}{" "}
+                      kg CO₂
+                    </p>
+                  </div>
+                </div>
+
+                <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isProcessingCheckout}>
+                  {isProcessingCheckout ? "Processing..." : "Proceed to Checkout"}
                 </Button>
                 <Link href="/">
                   <Button variant="outline" className="w-full bg-transparent">
@@ -154,6 +206,14 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Success Popup */}
+      <CheckoutSuccessPopup
+        isOpen={showCheckoutPopup}
+        onClose={handleCheckoutComplete}
+        cartItems={state.items}
+        orderTotal={finalTotal}
+      />
     </div>
   )
 }
